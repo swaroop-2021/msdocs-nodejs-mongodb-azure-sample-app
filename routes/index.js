@@ -38,7 +38,7 @@ router.post('/addTask', function(req, res, next) {
           secure: false, // true for 465, false for other ports
           auth: {
             user: "swaroopanegundi404@gmail.com",
-            pass: "Swaroop@2001",
+            pass: "hzkhkpxmqqzgoida",
           },
         });           
         transporter
