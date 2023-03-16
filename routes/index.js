@@ -3,16 +3,6 @@ var Task = require('../models/task');
 const nodemailer = require("nodemailer");
 var router = express.Router();
 
-let transporter = nodemailer.createTransport({
-  service: "gmail",
-  port: 587,
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: "swaroopanegundi404@gmail.com",
-    pass: "Swaroop@2001",
-  },
-});
-
 /* GET home page. */
 router.get('/', function(req, res, next) {
   Task.find()
@@ -42,7 +32,15 @@ router.post('/addTask', function(req, res, next) {
 
   task.save()
       .then(() => { 
-
+        let transporter = nodemailer.createTransport({
+          service: "gmail",
+          port: 587,
+          secure: false, // true for 465, false for other ports
+          auth: {
+            user: "swaroopanegundi404@gmail.com",
+            pass: "Swaroop@2001",
+          },
+        });           
         transporter
             .sendMail({
               from: "swaroopanegundi404@gmail.com",
@@ -50,10 +48,13 @@ router.post('/addTask', function(req, res, next) {
               subject: "Welcome to Azure To Do List",
               html: `<b>Hello Dear User,</br>You have created a Task named ${taskName} on ${createDate}. Kind Regards, Azure To Do List.</b>`,
             })
-            .then((info) => console.log("Email has been sent!"))
+            .then((info) =>{
+              console.log("Email has been sent!")
+              console.log(`Added new task ${taskName} - createDate ${createDate}`)        
+              res.redirect('/'); 
+            })
             .catch((err) => console.log(err));
-        console.log(`Added new task ${taskName} - createDate ${createDate}`)        
-        res.redirect('/'); })
+      })
       .catch((err) => {
           console.log(err);
           res.send('Sorry! Something went wrong.');
@@ -68,15 +69,6 @@ router.post('/completeTask', function(req, res, next) {
   Task.findByIdAndUpdate(taskId, { completed: true, completedDate: Date.now()})
     .then(() => { 
       console.log(`Completed task ${taskId}`)
-      transporter
-            .sendMail({
-              from: "swaroopanegundi404@gmail.com",
-              to: "01fe20bcs108@kletech.ac.in",
-              subject: "Welcome to Azure To Do List",
-              html: `<b>Hello Dear User,</br>You have completed a Task named ${taskName} on ${Date.now()}. Kind Regards, Azure To Do List.</b>`,
-            })
-            .then((info) => console.log("Email has been sent!"))
-            .catch((err) => console.log(err));
       res.redirect('/'); }  )
     .catch((err) => {
       console.log(err);
@@ -91,15 +83,6 @@ router.post('/deleteTask', function(req, res, next) {
   Task.findByIdAndDelete(taskId)
     .then(() => { 
       console.log(`Deleted task $(taskId)`)      
-      transporter
-            .sendMail({
-              from: "swaroopanegundi404@gmail.com",
-              to: "01fe20bcs108@kletech.ac.in",
-              subject: "Welcome to Azure To Do List",
-              html: `<b>Hello Dear User,</br>You have deleted a Task named ${taskName} on ${Date.now()}. Kind Regards, Azure To Do List.</b>`,
-            })
-            .then((info) => console.log("Email has been sent!"))
-            .catch((err) => console.log(err));
       res.redirect('/'); }  )
     .catch((err) => {
       console.log(err);
